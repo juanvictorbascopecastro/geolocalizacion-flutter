@@ -1,39 +1,40 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:movil_location/models/Persona.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:movil_location/models/models.dart';
 import 'package:http/http.dart' as http;
+import 'package:movil_location/services/api_service.dart';
 
 class CiudadService extends ChangeNotifier {
-  // final String _baseUrl = 'http://192.168.1.102:3000/api/v1';
-  final String _baseUrl = 'https://sis131.onrender.com/api/v1';
+  final storage = const FlutterSecureStorage();
   static const String path = '/ciudades';
   final List<Ciudad> ciudades = [];
   bool isLoading = true;
 
   CiudadService() {
-    loadCiudad();
+    // if(ciudades.length <= 0) loadCiudad();
   }
 
   Future<List<Ciudad>> loadCiudad() async {
-    this.isLoading = true;
-    notifyListeners();
+    if(ciudades.isNotEmpty) return ciudades;
+    isLoading = true;
+    // notifyListeners();
 
-    final url = Uri.parse(_baseUrl + path);
-    final resp = await http.get(url);
+    final url = Uri.parse('${ServiceApi.baseUrl}$path');
+    http.Response response = await http.get(url);
 
-    // print(jsonDecode(resp.body));
 
-    List<dynamic> ciudadesMap = jsonDecode(resp.body);
+
+    List<dynamic> ciudadesMap = jsonDecode(response.body);
+    // print(ciudadesMap);
     ciudadesMap.forEach((value) {
       final tempCiudad = Ciudad.fromMap(value);
-      this.ciudades.add(tempCiudad);
+      ciudades.add(tempCiudad);
     });
 
-    this.isLoading = false;
-    notifyListeners();
+    isLoading = false;
+    // notifyListeners();
 
-    return this.ciudades;
+    return ciudades;
   }
 }

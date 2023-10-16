@@ -1,10 +1,11 @@
+export 'package:movil_location/screens/admin/edit_user_screen.dart';
+export 'package:movil_location/screens/profile_screen.dart';
+export 'package:movil_location/screens/admin/ciudad_screen.dart';
+export 'package:movil_location/screens/admin/users_screen.dart';
 export 'package:movil_location/screens/check_auth_screen.dart';
 export 'package:movil_location/screens/loading_screen.dart';
-export 'package:movil_location/screens/register_user_screen.dart';
+export 'package:movil_location/screens/admin/register_user_screen.dart';
 export 'package:movil_location/screens/login_screen.dart';
 export 'package:movil_location/screens/home_screen_couter.dart';
-export 'package:movil_location/screens/home_screen.dart';
-export 'package:movil_location/screens/admin_screen.dart';
-export 'package:movil_location/screens/user_screen.dart';
-
-
+export 'package:movil_location/screens/user/home_screen.dart';
+export 'package:movil_location/screens/admin/admin_screen.dart';

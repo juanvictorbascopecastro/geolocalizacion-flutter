@@ -5,31 +5,33 @@ import 'package:movil_location/models/models.dart';
 class Ciudad {
   int id;
   String nombre;
-  String descripcion;
+  String? descripcion;
   Departamento departamento;
 
   Ciudad({
     required this.id,
     required this.nombre,
-    required this.descripcion,
+    this.descripcion,
     required this.departamento,
   });
 
-  Ciudad.fromMap(Map<String, dynamic> map)
-      : id = map['id'],
-        nombre = map['nombre'],
-        descripcion = map['descripcion'],
-        departamento = Departamento.fromMap(map['departamento']);
+  factory Ciudad.fromJson(String str) => Ciudad.fromMap(jsonDecode(str));
 
-  // factory Ciudad.fromJson(String str) => Ciudad.fromMap(json.decode(str));
+  String toJson() => json.encode(toMap());
 
-  // String toJson() => json.encode(toMap());
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'nombre': nombre,
+      'descripcion': descripcion,
+      'departamento': departamento.toMap(),
+    };
+  }
 
-  /*factory Ciudad.fromMap(String json) => Ciudad(
-    nombre: json['nombre'],
-    descripcion: json['descripcion'],
-    id: json['id'],
-    departamento: Departamento.fromJson(json['departamento']),
-  );*/
-
+  factory Ciudad.fromMap(Map<String, dynamic> json) => Ciudad(
+        id: json['id'],
+        nombre: json['nombre'],
+        descripcion: json['descripcion'],
+        departamento: Departamento.fromMap(json['departamento']),
+      );
 }

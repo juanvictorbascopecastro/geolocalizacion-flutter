@@ -55,6 +55,7 @@ class _LoginForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    // Provider.of<SeedService>(context);
     final loginForm = Provider.of<LoginFormProvider>(context);
     final authService = Provider.of<AuthService>(context, listen: false);
 
@@ -65,9 +66,8 @@ class _LoginForm extends StatelessWidget {
 
         child: Column(
           children: [
-
             TextFormField(
-              autocorrect: false,
+              autocorrect: true,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecorations.authInputDecoration(
                   hintText: 'ejemplo@ejemplo.com',
@@ -83,9 +83,7 @@ class _LoginForm extends StatelessWidget {
                     : '¡El correo electrónico no es válido!';
               },
             ),
-
             const SizedBox( height: 30 ),
-
             TextFormField(
               autocorrect: false,
               obscureText: true,
@@ -113,17 +111,24 @@ class _LoginForm extends StatelessWidget {
                 onPressed: loginForm.isLoading ? null : () async {
                   FocusScope.of(context).unfocus();
                   // TODO: validar si el login es correcto
-                  if( !loginForm.isValidForm() ) return;
+                  if( !loginForm.isValidForm() ) {
+                    print('Formulario no valido');
+                    return;
+                  }
                   loginForm.isLoading = true;
-                  final String? errorResponse = await authService.login(loginForm.email, loginForm.password);
-                  // await Future.delayed(const Duration(seconds: 2 ));
-                  if(errorResponse == null) {
-                    Navigator.of(context).pushReplacementNamed('home');
+                  final Map<String, dynamic> response = await authService.login(loginForm.email, loginForm.password);
+                  if(response['error'] == false) {
+                    if(response['data'] != null) {
+                      Navigator.of(context).pushReplacementNamed('homeAdmin');
+                    } else {
+                      Navigator.of(context).pushReplacementNamed('home');
+                    }
                   } else {
                     loginForm.isLoading = false;
-                    NotificationService.showSnackbar(errorResponse, Colors.redAccent, true);
+                    // print( response['message']);
+                    // List<dynamic> message = response['message'];
+                    NotificationService.showSnackbar(response['message'], Colors.redAccent, true);
                   }
-
                 },
                 child: Container(
                   width: double.maxFinite,

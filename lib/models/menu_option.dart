@@ -6,10 +6,9 @@ class MenuOption {
   final String name;
   final Widget screem;
 
-  MenuOption({
-    required this.route,
-    required this.icon,
-    required this.name,
-    required this.screem
-});
+  MenuOption(
+      {required this.route,
+      required this.icon,
+      required this.name,
+      required this.screem});
 }

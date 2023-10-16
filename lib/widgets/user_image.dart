@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:movil_location/services/services.dart';
 
 class UserImage extends StatelessWidget {
-  final String? url_umage;
+  final PersonaService personaService;
 
-  const UserImage({super.key, this.url_umage});
+  const UserImage({super.key, required this.personaService});
 
   @override
   Widget build(BuildContext context) {
@@ -13,23 +16,13 @@ class UserImage extends StatelessWidget {
         height: 320,
         child: ClipRRect(
           borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-          child: url_umage == null
-            ? const Image(
-              image: AssetImage('assets/no_image.png'),
-            fit: BoxFit.cover,
-            )
-            : FadeInImage(
-              image: NetworkImage(url_umage!),
-              placeholder: const AssetImage('assets/loading.gif'),
-              fit: BoxFit.cover
-          ),
+          child: getImage()
         )
     );
   }
 
   BoxDecoration _buildBoxDecoration() => BoxDecoration(
     borderRadius: const BorderRadius.only( topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-    color: Colors.red,
     boxShadow: [
       BoxShadow(
         color: Colors.black.withOpacity(0.05),
@@ -39,4 +32,24 @@ class UserImage extends StatelessWidget {
     ]
   );
 
+  Widget getImage() {
+    if(personaService.newPictureFile != null) {
+      return Image.file(
+          File(personaService.newPictureFile!.path),
+          fit: BoxFit.cover
+      );
+    }
+    if(personaService.selectedPersona == null || personaService.selectedPersona!.foto == null) {
+      return const Image(
+        image: AssetImage('assets/no_image.png'),
+        fit: BoxFit.cover,
+      );
+    }
+    return FadeInImage(
+        image: NetworkImage(personaService.getUrlImage(personaService.selectedPersona!.foto!, 'persona')),
+        placeholder: const AssetImage('assets/loading.gif'),
+        fit: BoxFit.cover
+    );
+
+  }
 }

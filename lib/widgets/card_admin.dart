@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:movil_location/models/models.dart';
 import 'package:movil_location/themes/app_theme.dart';
 
 class CardAdmin extends StatelessWidget {
+  final Persona persona;
+
   const CardAdmin({
     Key? key,
+    required this.persona
   }) : super(key: key);
 
   @override
@@ -11,7 +15,6 @@ class CardAdmin extends StatelessWidget {
     return Card(
         child: Column(
           children: [
-
             const ListTile(
               leading: Icon( Icons.photo_album_outlined, color: AppTheme.primary  ),
               title: Text('Soy un título'),

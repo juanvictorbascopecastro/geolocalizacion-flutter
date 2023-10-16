@@ -37,7 +37,7 @@ class AppTheme {
               topRight: Radius.circular(10)
           ),
         ),
-      )
+      ),
   );
 
   static final ThemeData darkTheme = ThemeData.light().copyWith(

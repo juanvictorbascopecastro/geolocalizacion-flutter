@@ -27,7 +27,7 @@ class CheckAuthScreen extends StatelessWidget{
                 });
               } else {
                 // TODO: verificar los roles del usuario
-                final Future<Persona?> personaFuture = authService.getPersona();
+                final Future<Auth?> personaFuture = authService.getPersona();
                 personaFuture.then((value) => {
                   if(value!.usuario == null) {
                     Future.microtask(() {
@@ -39,13 +39,12 @@ class CheckAuthScreen extends StatelessWidget{
                   } else {
                     Future.microtask(() {
                       Navigator.pushReplacement(context, PageRouteBuilder(
-                          pageBuilder: ( _, __ , ___) => const AdminScreem(),
+                          pageBuilder: ( _, __ , ___) => const UsersScreem(),
                           transitionDuration: const Duration(seconds: 0)
                       ));
                     })
                   }
                 });
-
               }
               return Container();
           }
