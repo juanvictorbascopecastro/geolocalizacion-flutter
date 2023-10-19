@@ -2,40 +2,55 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:movil_location/models/models.dart';
-import 'package:movil_location/providers/providers.dart';
+import 'package:movil_location/providers/auth_form_provider.dart';
 import 'package:movil_location/services/services.dart';
 import 'package:movil_location/themes/app_theme.dart';
 import 'package:movil_location/ui/input_decorations.dart';
-import 'package:movil_location/widgets/widget.dart';
+import 'package:movil_location/widgets/user_image.dart';
 import 'package:provider/provider.dart';
 
-class RegisterUserScreen extends StatelessWidget {
-  const RegisterUserScreen({super.key});
+class ProfileAdminScreen extends StatelessWidget {
+  const ProfileAdminScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => PersonaFormCreateProvider(PersonaCreate(
-          nombre: '',
-          apellido: '',
-          telefono: '',
-          email: '',
-          password: '',
-          id_ciudad: 0)),
-      child: _PersonaScreenBody(),
-    );
+    final authService = Provider.of<AuthService>(context, listen: false);
+
+    return Scaffold(
+        // backgroundColor: Colors.lightBlue,
+        body: FutureBuilder(
+            future: authService.getPersona(),
+            builder: (BuildContext context, AsyncSnapshot<Auth?> snapshot) {
+              if (!snapshot.hasData) return Text('Cargando perfil...');
+              if (snapshot.data != null) {
+                return ChangeNotifierProvider(
+                  create: (_) {
+                    final authUpdate = AuthUpdate(
+                        nombre: snapshot.data!.nombre,
+                        apellido: snapshot.data!.apellido,
+                        email: snapshot.data!.email,
+                        password: '',
+                        telefono: snapshot.data!.telefono!,
+                        ci: snapshot.data!.ci!,
+                        direccion: snapshot.data!.direccion,
+                        fecha_nacimiento: snapshot.data!.fecha_nacimiento);
+                    return AuthFormProvider(authUpdate);
+                  },
+                  child: _ProfileScreenBody(),
+                );
+              }
+              return Container();
+            }));
   }
 }
 
-class _PersonaScreenBody extends StatelessWidget {
+class _ProfileScreenBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     final personaService = Provider.of<PersonaService>(context);
 
     return Scaffold(
-      /* appBar: AppBar(
-        title: const Text('Registrar Usuario', style: TextStyle(color: Colors.white),),
-      ), */
       body: SingleChildScrollView(
         child: Padding(
           padding:
@@ -78,7 +93,7 @@ class _PersonaScreenBody extends StatelessWidget {
                       ))
                 ],
               ),
-              _UserForm(personaService: personaService),
+              _AuthForm(authService: authService),
             ],
           ),
         ),
@@ -87,16 +102,16 @@ class _PersonaScreenBody extends StatelessWidget {
   }
 }
 
-class _UserForm extends StatelessWidget {
-  final PersonaService personaService;
+class _AuthForm extends StatelessWidget {
+  final AuthService authService;
 
-  const _UserForm({Key? key, required this.personaService}) : super(key: key);
+  const _AuthForm({Key? key, required this.authService}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final ciudadService = Provider.of<CiudadService>(context);
     final GlobalKey<FormState> myFormKey = GlobalKey<FormState>();
-    final personaForm = Provider.of<PersonaFormCreateProvider>(context);
+    final authForm = Provider.of<AuthFormProvider>(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -114,7 +129,7 @@ class _UserForm extends StatelessWidget {
               keyboardType: TextInputType.name,
               decoration: InputDecorations.authInputDecoration(
                   labelText: 'Nombre', prefixIcon: Icons.person_outline_sharp),
-              onChanged: (value) => personaForm.persona.nombre = value,
+              onChanged: (value) => authForm.auth.nombre = value,
               validator: (value) {
                 return value == null
                     ? 'El nombre es requerido!'
@@ -132,7 +147,7 @@ class _UserForm extends StatelessWidget {
               decoration: InputDecorations.authInputDecoration(
                   labelText: 'Apellido',
                   prefixIcon: Icons.person_outline_sharp),
-              onChanged: (value) => personaForm.persona.apellido = value,
+              onChanged: (value) => authForm.auth.apellido = value,
               validator: (value) {
                 return value == null
                     ? 'El apellido es requerido!'
@@ -151,8 +166,8 @@ class _UserForm extends StatelessWidget {
               decoration:
                   InputDecorations.authInputDecoration(labelText: 'Celular'),
               invalidNumberMessage: '¡Número de celular no válido!',
-              onChanged: (value) => personaForm.persona.telefono =
-                  value.countryCode + value.number,
+              onChanged: (value) =>
+                  authForm.auth.telefono = value.countryCode + value.number,
               /*validator: (value) {
                     if(value == null) return null;
                     if(value.number.length <= 0) return null;
@@ -166,7 +181,7 @@ class _UserForm extends StatelessWidget {
               decoration: InputDecorations.authInputDecoration(
                   labelText: 'Carnet de Identidad',
                   prefixIcon: Icons.person_pin_sharp),
-              onChanged: (value) => personaForm.persona.ci = value,
+              onChanged: (value) => authForm.auth.ci = value,
               validator: (value) {
                 return value == null
                     ? 'Carnet de identidad es requerido!'
@@ -178,73 +193,13 @@ class _UserForm extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
-            FutureBuilder(
-                future: ciudadService.loadCiudad(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Ciudad>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return DropdownButtonFormField<Ciudad>(
-                        items: [],
-                        decoration: InputDecorations.authInputDecoration(
-                          hintText: 'Cargando...',
-                          labelText: 'Ciudad',
-                        ),
-                        onChanged:
-                            (value) {}); //return CircularProgressIndicator(); // return Text('Cargando la ciudades...');
-                  }
-                  if (snapshot.data != null) {
-                    if (snapshot.data!.isNotEmpty)
-                      personaForm.persona.id_ciudad = snapshot.data![0].id;
-                    return DropdownButtonFormField<Ciudad>(
-                        value: snapshot.data![0],
-                        items: snapshot.data!.map((val) {
-                          return DropdownMenuItem(
-                              value: val, child: Text(val.nombre));
-                        }).toList(),
-                        decoration: InputDecorations.authInputDecoration(
-                          hintText: 'Seleccionar la ciudad...',
-                          labelText: 'Ciudad',
-                        ),
-                        onChanged: (value) =>
-                            personaForm.persona.id_ciudad = value!.id);
-                  }
-                  return Container();
-                }),
-            const SizedBox(
-              height: 10,
-            ),
             TextFormField(
               autovalidateMode: AutovalidateMode.onUserInteraction,
               keyboardType: TextInputType.streetAddress,
               decoration: InputDecorations.authInputDecoration(
                   labelText: 'Direccion', prefixIcon: Icons.location_city),
-              onChanged: (value) => personaForm.persona.direccion = value,
+              onChanged: (value) => authForm.auth.direccion = value,
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            DropdownButtonFormField<String>(
-                value: 'empleado',
-                items: const [
-                  DropdownMenuItem(
-                    value: 'empleado',
-                    child: Text('Empleado'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'usuario',
-                    child: Text('Usuario'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'admin',
-                    child: Text('Administrador'),
-                  ),
-                ],
-                decoration: InputDecorations.authInputDecoration(
-                  hintText: 'Seleccionar Rol...',
-                  labelText: 'Rol de usuario',
-                ),
-                onChanged: (value) =>
-                    personaForm.persona.rol = value ?? 'empleado'),
             const SizedBox(
               height: 10,
             ),
@@ -255,7 +210,7 @@ class _UserForm extends StatelessWidget {
                   hintText: 'ejemplo@ejemplo.com...',
                   labelText: 'Correo electrónico',
                   prefixIcon: Icons.email),
-              onChanged: (value) => personaForm.persona.email = value,
+              onChanged: (value) => authForm.auth.email = value,
               validator: (value) {
                 String pattern =
                     r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
@@ -276,7 +231,7 @@ class _UserForm extends StatelessWidget {
                   hintText: '******',
                   labelText: 'Contraseña',
                   prefixIcon: Icons.key),
-              onChanged: (value) => personaForm.persona.password = value,
+              onChanged: (value) => authForm.auth.password = value,
               validator: (value) {
                 return (value != null && value.length >= 6)
                     ? null
@@ -307,9 +262,8 @@ class _UserForm extends StatelessWidget {
                   print('Formulario no valido');
                   return;
                 }
-                final response =
-                    await personaService.create(personaForm.persona);
-                if (response == null) Navigator.pop(context);
+                // final response = await authService.updateProfile(authForm.auth);
+                // if (response == null) Navigator.pop(context);
               },
             ),
             const SizedBox(

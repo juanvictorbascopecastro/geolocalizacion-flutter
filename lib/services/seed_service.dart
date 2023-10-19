@@ -10,9 +10,10 @@ class SeedService extends ChangeNotifier {
     executeSeed();
   }
 
-  Future  executeSeed () async {
-    http.Response response = await http.post(Uri.parse('${ServiceApi.baseUrl}$path'),
-        headers: { "Content-Type" : "application/json" },
+  Future executeSeed() async {
+    http.Response response = await http.post(
+      Uri.parse('${ServiceApi.baseUrl}$path'),
+      headers: {"Content-Type": "application/json"},
     );
     print(response.body);
   }

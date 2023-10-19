@@ -116,7 +116,7 @@ class PersonaService extends ChangeNotifier {
         url,
         headers: {
           'Authorization': 'Bearer $token',
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: data,
       );
@@ -184,5 +184,34 @@ class PersonaService extends ChangeNotifier {
     List<String> listPath = pathFoto.split('/');
     String nameFile = listPath.last;
     return '${ServiceApi.baseUrl}$_path/$routeFile/$nameFile';
+  }
+
+  Future<String?> updateState(bool status, int id) async {
+    isSaving = true;
+    notifyListeners();
+    final String token = await storage.read(key: 'token') ?? '';
+    final url = Uri.parse('${ServiceApi.baseUrl}$_path/estado/${id}');
+
+    final http.Response response = await http.patch(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      },
+      body: jsonEncode({"estado": status}),
+    );
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> mapData = jsonDecode(response.body);
+      Persona persona = Persona.fromMap(mapData);
+      final index = personas.indexWhere((element) => element.id == persona.id);
+      personas[index] = persona;
+
+      isSaving = false;
+      notifyListeners();
+      return null;
+    }
+    return 'Ocurrio un error!';
   }
 }

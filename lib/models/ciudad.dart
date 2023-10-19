@@ -34,4 +34,10 @@ class Ciudad {
         descripcion: json['descripcion'],
         departamento: Departamento.fromMap(json['departamento']),
       );
+
+  Ciudad copy() => Ciudad(
+      id: this.id,
+      nombre: this.nombre,
+      descripcion: this.descripcion,
+      departamento: this.departamento);
 }

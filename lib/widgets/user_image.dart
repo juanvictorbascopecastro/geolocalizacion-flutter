@@ -14,42 +14,42 @@ class UserImage extends StatelessWidget {
         decoration: _buildBoxDecoration(),
         width: double.infinity,
         height: 320,
-        child: ClipRRect(
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-          child: getImage()
-        )
-    );
+        child: Opacity(
+          opacity: 0.8,
+          child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+              child: getImage()),
+        ));
   }
 
   BoxDecoration _buildBoxDecoration() => BoxDecoration(
-    borderRadius: const BorderRadius.only( topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.05),
-        blurRadius: 10,
-        offset: const Offset(0,5)
-      )
-    ]
-  );
+          color: Colors.black,
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 5))
+          ]);
 
   Widget getImage() {
-    if(personaService.newPictureFile != null) {
-      return Image.file(
-          File(personaService.newPictureFile!.path),
-          fit: BoxFit.cover
-      );
+    if (personaService.newPictureFile != null) {
+      return Image.file(File(personaService.newPictureFile!.path),
+          fit: BoxFit.cover);
     }
-    if(personaService.selectedPersona == null || personaService.selectedPersona!.foto == null) {
+    if (personaService.selectedPersona == null ||
+        personaService.selectedPersona!.foto == null) {
       return const Image(
         image: AssetImage('assets/no_image.png'),
         fit: BoxFit.cover,
       );
     }
     return FadeInImage(
-        image: NetworkImage(personaService.getUrlImage(personaService.selectedPersona!.foto!, 'persona')),
+        image: NetworkImage(personaService.getUrlImage(
+            personaService.selectedPersona!.foto!, 'persona')),
         placeholder: const AssetImage('assets/loading.gif'),
-        fit: BoxFit.cover
-    );
-
+        fit: BoxFit.cover);
   }
 }

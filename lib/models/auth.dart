@@ -54,7 +54,8 @@ class Auth {
         apellido: json['apellido'],
         ci: json['ci'],
         direccion: json['direccion'],
-        usuario: Usuario.fromMap(json['usuario']),
+        usuario:
+            json['usuario'] != null ? Usuario.fromMap(json['usuario']) : null,
         telefono: json['telefono'],
         email: json['email'],
         fecha_nacimiento: json['fecha_nacimiento'],

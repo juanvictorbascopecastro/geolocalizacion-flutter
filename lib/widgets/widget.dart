@@ -1,3 +1,5 @@
+export 'package:movil_location/widgets/bottom_navigator_users.dart';
+
 export 'package:movil_location/widgets/app_bar_admin.dart';
 export 'package:movil_location/widgets/side_menu_admin.dart';
 export 'package:movil_location/widgets/user_image.dart';

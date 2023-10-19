@@ -1,3 +1,4 @@
+export 'package:movil_location/models/dto/auth_update.dart';
 export 'package:movil_location/models/Persona.dart';
 export 'package:movil_location/models/usuario.dart';
 export 'package:movil_location/models/auth.dart';
@@ -8,3 +9,4 @@ export 'package:movil_location/models/menu_option.dart';
 // DTOs
 export 'package:movil_location/models/dto/persona_create.dart';
 export 'package:movil_location/models/dto/persona_update.dart';
+export 'package:movil_location/models/dto/ciudad_create.dart';
